@@ -1,0 +1,27 @@
+{
+    "name": "nes-game-library",
+    "version": "1.0.0",
+    "description": "Classic NES Games Library - Play directly in your browser",
+    "author": "daiphu1801",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/daiphu1801/NestGameLibrary"
+    },
+    "scripts": {
+        "start": "npx serve .",
+        "generate": "node scripts/generate-games.js",
+        "dev": "npx serve . -p 3000"
+    },
+    "keywords": [
+        "nes",
+        "games",
+        "emulator",
+        "retro",
+        "nintendo",
+        "nostalgist"
+    ],
+    "devDependencies": {
+        "dotenv": "^17.2.3"
+    }
+}

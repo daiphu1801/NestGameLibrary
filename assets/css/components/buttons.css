@@ -1,0 +1,340 @@
+/* ==============================================
+   BUTTON COMPONENTS - Modern 2026 Design
+   Neumorphism & Clean Monochrome Style
+   ============================================== */
+
+/* ===== Base Button ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    line-height: var(--leading-normal);
+    border-radius: var(--radius-xl);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Ripple Effect */
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0);
+    transition: all var(--duration-slow) ease-out;
+}
+
+.btn:active::after {
+    opacity: 1;
+    transform: scale(2);
+    transition: none;
+}
+
+/* ===== Button Sizes ===== */
+.btn-xs {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-lg);
+    gap: var(--space-1);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-lg);
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    border-radius: var(--radius-2xl);
+}
+
+.btn-xl {
+    padding: var(--space-5) var(--space-8);
+    font-size: var(--text-lg);
+    border-radius: var(--radius-2xl);
+}
+
+/* ===== Primary Button (Neumorphic) ===== */
+.btn-primary {
+    background: var(--text-primary);
+    color: var(--text-inverse);
+    box-shadow: var(--neu-shadow-outer);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        var(--shadow-lg),
+        0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--neu-shadow-inner);
+}
+
+[data-theme="light"] .btn-primary {
+    background: var(--text-primary);
+    color: var(--text-inverse);
+}
+
+/* ===== Secondary Button ===== */
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    border-color: var(--border-color-strong);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--neu-shadow-inner);
+}
+
+/* ===== Glass Button ===== */
+.btn-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+.btn-glass:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+[data-theme="light"] .btn-glass:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Ghost Button ===== */
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .btn-ghost:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* ===== Outline Button ===== */
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: var(--text-primary);
+    color: var(--text-inverse);
+    transform: translateY(-2px);
+}
+
+/* ===== Accent Button ===== */
+.btn-accent {
+    background: var(--gradient-accent);
+    color: white;
+    box-shadow: 
+        var(--shadow-md),
+        0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.btn-accent:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        var(--shadow-lg),
+        0 0 30px rgba(139, 92, 246, 0.4);
+}
+
+.btn-accent:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* ===== Danger Button ===== */
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        var(--shadow-lg),
+        0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+/* ===== Success Button ===== */
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        var(--shadow-lg),
+        0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* ===== Icon Button ===== */
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: var(--radius-xl);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-icon:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--border-color-strong);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-icon-sm {
+    width: 36px;
+    height: 36px;
+}
+
+.btn-icon-lg {
+    width: 52px;
+    height: 52px;
+}
+
+/* ===== Neumorphic Button ===== */
+.btn-neu {
+    background: var(--neu-bg);
+    color: var(--text-primary);
+    border: none;
+    box-shadow: var(--neu-shadow-outer);
+}
+
+.btn-neu:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        12px 12px 24px var(--neu-shadow-dark),
+        -12px -12px 24px var(--neu-shadow-light);
+}
+
+.btn-neu:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--neu-shadow-pressed);
+}
+
+/* ===== Pill Button ===== */
+.btn-pill {
+    border-radius: var(--radius-full);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+}
+
+/* ===== Button Group ===== */
+.btn-group {
+    display: inline-flex;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    border-right: 1px solid var(--border-color);
+}
+
+.btn-group .btn:first-child {
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+}
+
+.btn-group .btn:last-child {
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    border-right: none;
+}
+
+/* ===== Loading State ===== */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== Focus States ===== */
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 
+        0 0 0 3px var(--bg-primary),
+        0 0 0 5px rgba(139, 92, 246, 0.5);
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    .btn {
+        transition: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .btn-loading::before {
+        animation: none;
+    }
+}

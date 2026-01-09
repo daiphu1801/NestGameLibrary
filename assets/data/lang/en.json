@@ -1,0 +1,94 @@
+{
+    "app": {
+        "title": "NES Game Library",
+        "subtitle": "Classic NES Games Collection",
+        "description": "Play directly in your browser!"
+    },
+    "header": {
+        "searchPlaceholder": "Search games...",
+        "gamesFound": "Found",
+        "games": "games",
+        "search": "Search"
+    },
+    "categories": {
+        "all": "All",
+        "platformer": "Platform",
+        "rpg": "RPG",
+        "sports": "Sports",
+        "fighting": "Fighting",
+        "puzzle": "Puzzle",
+        "racing": "Racing",
+        "shooter": "Shooter",
+        "strategy": "Strategy",
+        "adventure": "Adventure",
+        "other": "Other"
+    },
+    "featured": {
+        "title": "Classic Games",
+        "subtitle": "Legendary titles you can't miss"
+    },
+    "library": {
+        "title": "Game Library",
+        "subtitle": "Browse and select a game to play"
+    },
+    "welcome": {
+        "title": "Welcome to NES Game Library!",
+        "description": "Explore over {count}+ classic NES games. All playable directly in your browser. Click any game to start!",
+        "free": "Free",
+        "noInstall": "No installation",
+        "saveState": "Save state"
+    },
+    "game": {
+        "playNow": "Play now",
+        "loading": "Loading",
+        "waitMessage": "Please wait a moment",
+        "loadError": "Failed to load game",
+        "tryAgain": "Please try again",
+        "selectRom": "Select ROM file",
+        "runServerHint": "To auto-load games, run local server:",
+        "orSelectManually": "Or select ROM file manually:"
+    },
+    "modal": {
+        "playing": "Now playing...",
+        "pressEscToBack": "Press ESC to go back",
+        "fullscreen": "Fullscreen",
+        "close": "Close"
+    },
+    "controls": {
+        "move": "Move",
+        "buttonA": "Button A",
+        "buttonB": "Button B",
+        "start": "Start",
+        "select": "Select",
+        "back": "Back"
+    },
+    "footer": {
+        "poweredBy": "Powered by",
+        "gamesCount": "Games",
+        "playOnBrowser": "Play on browser",
+        "free100": "100% Free"
+    },
+    "search": {
+        "hot": "Hot",
+        "noResults": "No games found",
+        "tryOther": "Try searching with different keywords",
+        "clearSearch": "Clear search"
+    },
+    "sort": {
+        "label": "Sort by:",
+        "nameAsc": "Name A-Z",
+        "nameDesc": "Name Z-A",
+        "ratingDesc": "Highest rated",
+        "yearDesc": "Newest first",
+        "yearAsc": "Oldest first"
+    },
+    "pagination": {
+        "showing": "Showing",
+        "of": "of",
+        "games": "games",
+        "previous": "Previous",
+        "next": "Next",
+        "itemsPerPage": "Show:"
+    },
+    "loadMore": "Load more games"
+}

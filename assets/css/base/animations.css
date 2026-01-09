@@ -1,0 +1,356 @@
+/* ===== Animation Keyframes & Utilities ===== */
+
+/* ===== Keyframe Definitions ===== */
+
+/* Background Gradient Animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Floating Animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Pulse Scale */
+@keyframes pulse-scale {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Spin Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+/* Shimmer Loading Effect */
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* Fade In */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Fade In Up */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade In Down */
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scale In */
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Neon Glow Pulse */
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 5px var(--color-accent-light),
+            0 0 10px var(--color-accent),
+            0 0 15px var(--color-accent-dark);
+    }
+
+    50% {
+        box-shadow:
+            0 0 10px var(--color-accent-light),
+            0 0 20px var(--color-accent),
+            0 0 30px var(--color-accent-dark);
+    }
+}
+
+/* Slide In Right */
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===== Animation Utility Classes ===== */
+
+/* Animated Background */
+.bg-animated {
+    background: var(--gradient-bg-animated);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+}
+
+/* Float */
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse */
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.animate-pulse-scale {
+    animation: pulse-scale 2s ease-in-out infinite;
+}
+
+/* Spin */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-spin-slow {
+    animation: spin 3s linear infinite;
+}
+
+/* Bounce */
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+/* Shimmer */
+.animate-shimmer {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+[data-theme="light"] .animate-shimmer {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.05) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+}
+
+/* Fade In */
+.animate-fade-in {
+    animation: fade-in var(--duration-base) var(--ease-out);
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up var(--duration-slow) var(--ease-out);
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down var(--duration-slow) var(--ease-out);
+}
+
+/* Scale In */
+.animate-scale-in {
+    animation: scale-in var(--duration-base) var(--ease-out);
+}
+
+/* Slide In */
+.animate-slide-in-right {
+    animation: slide-in-right var(--duration-slow) var(--ease-out);
+}
+
+/* Glow Pulse */
+.animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ===== Transition Utilities ===== */
+
+.transition-none {
+    transition: none;
+}
+
+.transition-all {
+    transition: all var(--transition-base);
+}
+
+.transition-fast {
+    transition: all var(--transition-fast);
+}
+
+.transition-slow {
+    transition: all var(--transition-slow);
+}
+
+.transition-colors {
+    transition:
+        color var(--transition-base),
+        background-color var(--transition-base),
+        border-color var(--transition-base);
+}
+
+.transition-opacity {
+    transition: opacity var(--transition-base);
+}
+
+.transition-transform {
+    transition: transform var(--transition-base);
+}
+
+.transition-shadow {
+    transition: box-shadow var(--transition-base);
+}
+
+/* ===== Hover Transform Utilities ===== */
+
+.hover\:scale-102:hover {
+    transform: scale(1.02);
+}
+
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+
+.hover\:scale-110:hover {
+    transform: scale(1.1);
+}
+
+.hover\:lift:hover {
+    transform: translateY(-4px);
+}
+
+.hover\:lift-lg:hover {
+    transform: translateY(-8px);
+}
+
+/* ===== Animation Delay Utilities ===== */
+
+.delay-75 {
+    animation-delay: 75ms;
+}
+
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-150 {
+    animation-delay: 150ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+.delay-500 {
+    animation-delay: 500ms;
+}
+
+.delay-700 {
+    animation-delay: 700ms;
+}
+
+.delay-1000 {
+    animation-delay: 1000ms;
+}

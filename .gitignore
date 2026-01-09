@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+env.js
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# Documentation
+PRODUCTION_PLAN.md
+
+# Wrangler local storage (not needed in git)
+nesgame/
+.wrangler/
+.dev.vars
+
+# ROM files (uploaded to R2, don't commit to git - 181MB)
+Library nes/
+
+# Package lock (optional, depends on team preference)
+package-lock.json

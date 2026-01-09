@@ -1,0 +1,251 @@
+/* ==============================================
+   GLOW EFFECTS - Modern 2026 Monochrome Design
+   Subtle & Elegant Glow Utilities
+   ============================================== */
+
+/* ===== Glow Text Effects ===== */
+
+/* Subtle White Glow */
+.glow-text {
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Accent Glow */
+.glow-text-accent {
+    text-shadow:
+        0 0 10px rgba(139, 92, 246, 0.5),
+        0 0 20px rgba(139, 92, 246, 0.3),
+        0 0 40px rgba(139, 92, 246, 0.2);
+}
+
+/* Light theme - reduce intensity */
+[data-theme="light"] .glow-text {
+    text-shadow:
+        0 0 8px rgba(0, 0, 0, 0.1),
+        0 0 16px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .glow-text-accent {
+    text-shadow:
+        0 0 8px rgba(124, 58, 237, 0.3),
+        0 0 16px rgba(124, 58, 237, 0.15);
+}
+
+/* ===== Glow Box Effects ===== */
+
+/* Small Glow */
+.glow-sm {
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.05),
+        0 0 30px rgba(139, 92, 246, 0.1);
+}
+
+/* Medium Glow */
+.glow-md {
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.08),
+        0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+/* Large Glow */
+.glow-lg {
+    box-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(139, 92, 246, 0.2);
+}
+
+/* White Glow */
+.glow-white {
+    box-shadow: var(--shadow-glow-white);
+}
+
+/* Accent Glow */
+.glow-accent {
+    box-shadow: var(--shadow-glow-accent);
+}
+
+/* Light theme shadows */
+[data-theme="light"] .glow-sm,
+[data-theme="light"] .glow-md,
+[data-theme="light"] .glow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== Glow Border Effects ===== */
+
+/* Subtle Border Glow */
+.glow-border {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 0 0 1px rgba(139, 92, 246, 0.1),
+        0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.glow-border:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 0 0 1px rgba(139, 92, 246, 0.2),
+        0 0 30px rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="light"] .glow-border {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 
+        0 0 0 1px rgba(124, 58, 237, 0.08),
+        0 0 20px rgba(124, 58, 237, 0.05);
+}
+
+/* ===== Gradient Glow Effects ===== */
+
+/* Gradient Glow Background */
+.gradient-glow {
+    position: relative;
+}
+
+.gradient-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.3) 0%,
+        rgba(168, 85, 247, 0.2) 50%,
+        rgba(139, 92, 246, 0.3) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(12px);
+    transition: all var(--transition-base);
+}
+
+.gradient-glow:hover::before {
+    opacity: 0.8;
+    filter: blur(16px);
+}
+
+[data-theme="light"] .gradient-glow::before {
+    background: linear-gradient(
+        135deg,
+        rgba(124, 58, 237, 0.2) 0%,
+        rgba(139, 92, 246, 0.15) 50%,
+        rgba(124, 58, 237, 0.2) 100%
+    );
+}
+
+/* ===== Animated Glow Effects ===== */
+
+/* Pulse Glow Animation */
+.glow-pulse {
+    animation: glow-pulse-animation 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-animation {
+    0%, 100% {
+        box-shadow: 
+            0 0 10px rgba(139, 92, 246, 0.2),
+            0 0 20px rgba(139, 92, 246, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 20px rgba(139, 92, 246, 0.4),
+            0 0 40px rgba(139, 92, 246, 0.2);
+    }
+}
+
+/* Breathing Glow */
+.glow-breathe {
+    animation: glow-breathe-animation 3s ease-in-out infinite;
+}
+
+@keyframes glow-breathe-animation {
+    0%, 100% {
+        opacity: 0.5;
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.8;
+        filter: blur(15px);
+    }
+}
+
+/* ===== Ring Glow (Focus States) ===== */
+.glow-ring {
+    transition: box-shadow var(--transition-base);
+}
+
+.glow-ring:focus-visible {
+    outline: none;
+    box-shadow: 
+        0 0 0 3px rgba(139, 92, 246, 0.3),
+        0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+[data-theme="light"] .glow-ring:focus-visible {
+    box-shadow: 
+        0 0 0 3px rgba(124, 58, 237, 0.2),
+        0 0 20px rgba(124, 58, 237, 0.1);
+}
+
+/* ===== Inset Glow ===== */
+.glow-inset {
+    box-shadow: 
+        inset 0 0 20px rgba(139, 92, 246, 0.1),
+        inset 0 0 40px rgba(139, 92, 246, 0.05);
+}
+
+[data-theme="light"] .glow-inset {
+    box-shadow: 
+        inset 0 0 20px rgba(124, 58, 237, 0.05),
+        inset 0 0 40px rgba(124, 58, 237, 0.02);
+}
+
+/* ===== Hover Glow States ===== */
+.hover\:glow-sm:hover {
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.05),
+        0 0 30px rgba(139, 92, 246, 0.1);
+}
+
+.hover\:glow-md:hover {
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.08),
+        0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+.hover\:glow-lg:hover {
+    box-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(139, 92, 246, 0.2);
+}
+
+/* ===== Gradient Text ===== */
+.gradient-text {
+    background: linear-gradient(
+        135deg,
+        var(--text-primary) 0%,
+        var(--text-secondary) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.gradient-text-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    .glow-pulse,
+    .glow-breathe,
+    .gradient-glow::before {
+        animation: none;
+    }
+}

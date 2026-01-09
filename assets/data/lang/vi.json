@@ -1,0 +1,94 @@
+{
+    "app": {
+        "title": "NES Game Library",
+        "subtitle": "Thư viện Game NES Kinh Điển",
+        "description": "Chơi trực tiếp trên trình duyệt!"
+    },
+    "header": {
+        "searchPlaceholder": "Tìm kiếm game...",
+        "gamesFound": "Tìm thấy",
+        "games": "games",
+        "search": "Tìm"
+    },
+    "categories": {
+        "all": "Tất cả",
+        "platformer": "Platform",
+        "rpg": "RPG",
+        "sports": "Thể thao",
+        "fighting": "Đối kháng",
+        "puzzle": "Puzzle",
+        "racing": "Đua xe",
+        "shooter": "Shooter",
+        "strategy": "Chiến thuật",
+        "adventure": "Phiêu lưu",
+        "other": "Khác"
+    },
+    "featured": {
+        "title": "Games Kinh Điển",
+        "subtitle": "Những tựa game huyền thoại không thể bỏ qua"
+    },
+    "library": {
+        "title": "Thư viện Games",
+        "subtitle": "Duyệt và chọn game để chơi"
+    },
+    "welcome": {
+        "title": "Chào mừng đến với NES Game Library!",
+        "description": "Khám phá hơn {count}+ game NES kinh điển. Tất cả đều có thể chơi trực tiếp trên trình duyệt. Click vào bất kỳ game nào để bắt đầu!",
+        "free": "Miễn phí",
+        "noInstall": "Không cần cài đặt",
+        "saveState": "Save state"
+    },
+    "game": {
+        "playNow": "Chơi ngay",
+        "loading": "Đang tải",
+        "waitMessage": "Vui lòng chờ trong giây lát",
+        "loadError": "Không thể tải game",
+        "tryAgain": "Vui lòng thử lại",
+        "selectRom": "Chọn file ROM",
+        "runServerHint": "Để tự động tải game, hãy chạy local server:",
+        "orSelectManually": "Hoặc chọn file ROM thủ công:"
+    },
+    "modal": {
+        "playing": "Đang chơi...",
+        "pressEscToBack": "Nhấn ESC để quay lại",
+        "fullscreen": "Fullscreen",
+        "close": "Đóng"
+    },
+    "controls": {
+        "move": "Di chuyển",
+        "buttonA": "Button A",
+        "buttonB": "Button B",
+        "start": "Start",
+        "select": "Select",
+        "back": "Quay lại"
+    },
+    "footer": {
+        "poweredBy": "Powered by",
+        "gamesCount": "Games",
+        "playOnBrowser": "Chơi trên trình duyệt",
+        "free100": "Miễn phí 100%"
+    },
+    "search": {
+        "hot": "Hot",
+        "noResults": "Không tìm thấy game nào",
+        "tryOther": "Thử tìm kiếm với từ khóa khác",
+        "clearSearch": "Xóa tìm kiếm"
+    },
+    "sort": {
+        "label": "Sắp xếp:",
+        "nameAsc": "Tên A-Z",
+        "nameDesc": "Tên Z-A",
+        "ratingDesc": "Đánh giá cao",
+        "yearDesc": "Mới nhất",
+        "yearAsc": "Cũ nhất"
+    },
+    "pagination": {
+        "showing": "Hiển thị",
+        "of": "trong",
+        "games": "games",
+        "previous": "Trang trước",
+        "next": "Trang sau",
+        "itemsPerPage": "Hiển thị:"
+    },
+    "loadMore": "Xem thêm games"
+}

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NES Game Library</title>
+    <meta name="description" content="Classic NES Games Collection - Play directly in your browser!">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://thumbnails.libretro.com">
+    <link rel="dns-prefetch" href="https://thumbnails.libretro.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'theme': {
+                            'primary': 'var(--color-primary)',
+                            'secondary': 'var(--color-secondary)',
+                            'accent': 'var(--color-accent)',
+                        }
+                    },
+                    backgroundColor: {
+                        'theme-primary': 'var(--bg-primary)',
+                        'theme-secondary': 'var(--bg-secondary)',
+                        'theme-card': 'var(--bg-card)',
+                    },
+                    textColor: {
+                        'theme-primary': 'var(--text-primary)',
+                        'theme-secondary': 'var(--text-secondary)',
+                        'theme-muted': 'var(--text-muted)',
+                    },
+                    borderColor: {
+                        'theme': 'var(--border-color)',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Nostalgist NES Emulator -->
+    <script src="https://unpkg.com/nostalgist@latest"></script>
+</head>
+
+<body class="min-h-screen" style="background: var(--bg-primary); color: var(--text-primary);">
+    <!-- Background Pattern -->
+    <div class="bg-pattern">
+        <div class="bg-animated"></div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-overlay__content">
+            <div class="loading-overlay__spinner">
+                <div class="loading-overlay__circle-bg"></div>
+                <div class="loading-overlay__circle"></div>
+                <div class="loading-overlay__icon">🎮</div>
+            </div>
+            <p class="loading-overlay__text">LOADING...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10">
+        <!-- Header -->
+        <header class="header">
+            <div class="container header__container">
+                <!-- Logo -->
+                <div id="logoContainer" class="logo" onclick="resetToDefault()" title="Nhấn để reset về mặc định">
+                    <div class="logo__icon-wrapper">
+                        <div class="logo__icon">🎮</div>
+                        <div class="logo__status"></div>
+                    </div>
+                    <div class="logo__text">
+                        <h1 class="logo__title" data-i18n="app.title">NES Game Library</h1>
+                        <p class="logo__subtitle">🕹️ <span data-i18n="app.subtitle">Thư viện Game NES Kinh Điển</span></p>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="search-wrapper">
+                    <div class="search-container">
+                        <div class="relative flex-1">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" 
+                                data-i18n-placeholder="header.searchPlaceholder"
+                                placeholder="Tìm kiếm game..."
+                                class="search-input">
+                            <button id="clearSearchBtn" class="search-clear hidden">✕</button>
+                            <div class="search-shortcut">
+                                <kbd>Ctrl+K</kbd>
+                            </div>
+                        </div>
+                        <button id="searchBtn" class="search-btn">
+                            <span>🔍</span>
+                            <span class="hidden sm:inline" data-i18n="header.search">Tìm</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="header__actions">
+                    <!-- Stats -->
+                    <div class="stats-display">
+                        <span class="stats-display__icon">📊</span>
+                        <span class="stats-display__label" data-i18n="header.gamesFound">Tìm thấy:</span>
+                        <span id="gameCount" class="stats-display__value">0</span>
+                        <span class="stats-display__label" data-i18n="header.games">games</span>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button id="themeToggle" class="toggle-btn" title="Toggle Dark/Light Mode">
+                        <span class="toggle-btn__icon">🌙</span>
+                    </button>
+
+                    <!-- Language Toggle -->
+                    <button id="langToggle" onclick="I18n.toggleLanguage()" class="toggle-btn" title="Switch language">
+                        🇻🇳
+                    </button>
+                </div>
+            </div>
+
+            <!-- Popular Tags -->
+            <div class="container">
+                <div class="popular-tags">
+                    <span class="popular-tags__label">🔥 <span data-i18n="search.hot">Nên thử</span>:</span>
+                    <button onclick="document.getElementById('searchInput').value='Mario';SearchFilter.performSearch();" class="popular-tag">
+                        🍄 Mario
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Contra';SearchFilter.performSearch();" class="popular-tag">
+                        🔫 Contra
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Zelda';SearchFilter.performSearch();" class="popular-tag">
+                        ⚔️ Zelda
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Mega Man';SearchFilter.performSearch();" class="popular-tag">
+                        🤖 Mega Man
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Castlevania';SearchFilter.performSearch();" class="popular-tag">
+                        🧛 Castlevania
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Metroid';SearchFilter.performSearch();" class="popular-tag">
+                        🚀 Metroid
+                    </button>
+                    <button onclick="document.getElementById('searchInput').value='Tetris';SearchFilter.performSearch();" class="popular-tag">
+                        🧩 Tetris
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Category Filter -->
+        <div class="category-bar">
+            <div class="container">
+                <div class="category-scroll">
+                    <button data-category="all" class="category-btn category-btn--active">
+                        <span>🎮</span>
+                        <span data-i18n="categories.all">Tất cả</span>
+                    </button>
+                    <button data-category="platformer" class="category-btn">
+                        <span>🏃</span>
+                        <span data-i18n="categories.platformer">Platform</span>
+                    </button>
+                    <button data-category="rpg" class="category-btn">
+                        <span>⚔️</span>
+                        <span data-i18n="categories.rpg">RPG</span>
+                    </button>
+                    <button data-category="sports" class="category-btn">
+                        <span>⚽</span>
+                        <span data-i18n="categories.sports">Thể thao</span>
+                    </button>
+                    <button data-category="fighting" class="category-btn">
+                        <span>🥊</span>
+                        <span data-i18n="categories.fighting">Đối kháng</span>
+                    </button>
+                    <button data-category="puzzle" class="category-btn">
+                        <span>🧩</span>
+                        <span data-i18n="categories.puzzle">Puzzle</span>
+                    </button>
+                    <button data-category="racing" class="category-btn">
+                        <span>🏎️</span>
+                        <span data-i18n="categories.racing">Đua xe</span>
+                    </button>
+                    <button data-category="shooter" class="category-btn">
+                        <span>🔫</span>
+                        <span data-i18n="categories.shooter">Shooter</span>
+                    </button>
+                    <button data-category="strategy" class="category-btn">
+                        <span>🎯</span>
+                        <span data-i18n="categories.strategy">Chiến thuật</span>
+                    </button>
+                    <button data-category="adventure" class="category-btn">
+                        <span>🗺️</span>
+                        <span data-i18n="categories.adventure">Phiêu lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="container main-content">
+            <!-- Featured Section -->
+            <section class="mb-12">
+                <!-- Section Header -->
+                <div class="section-header">
+                    <div class="section-icon section-icon--featured">
+                        <span>⭐</span>
+                    </div>
+                    <div class="section-info">
+                        <h2 class="section-title" data-i18n="featured.title">Games Kinh Điển</h2>
+                        <p class="section-subtitle" data-i18n="featured.subtitle">Những tựa game huyền thoại không thể bỏ qua</p>
+                    </div>
+                </div>
+
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-banner__content">
+                        <div class="welcome-banner__icon">🎮</div>
+                        <div class="welcome-banner__text">
+                            <h3 class="welcome-banner__title" data-i18n="welcome.title">
+                                Chào mừng đến với NES Game Library!
+                            </h3>
+                            <p id="welcomeDescription" class="welcome-banner__description">
+                                Khám phá hơn 1700+ game NES kinh điển.
+                            </p>
+                            <div class="welcome-banner__tags">
+                                <span class="welcome-tag">🆓 <span data-i18n="welcome.free">Miễn phí</span></span>
+                                <span class="welcome-tag">⚡ <span data-i18n="welcome.noInstall">Không cần cài đặt</span></span>
+                                <span class="welcome-tag">💾 <span data-i18n="welcome.saveState">Save state</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Game Grid Section -->
+            <section>
+                <!-- Section Header with Sort -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div class="section-header mb-0">
+                        <div class="section-icon">
+                            <span>📚</span>
+                        </div>
+                        <div class="section-info">
+                            <h2 class="section-title" data-i18n="library.title">Thư viện Games</h2>
+                            <p class="section-subtitle" data-i18n="library.subtitle">Duyệt và chọn game để chơi</p>
+                        </div>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="sort-container">
+                        <span class="sort-label" data-i18n="sort.label">Sắp xếp:</span>
+                        <select id="sortSelect" class="sort-select">
+                            <option value="name-asc" data-i18n="sort.nameAsc">Tên A-Z</option>
+                            <option value="name-desc" data-i18n="sort.nameDesc">Tên Z-A</option>
+                            <option value="rating-desc" data-i18n="sort.ratingDesc">Đánh giá cao</option>
+                            <option value="year-desc" data-i18n="sort.yearDesc">Mới nhất</option>
+                            <option value="year-asc" data-i18n="sort.yearAsc">Cũ nhất</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Game Grid -->
+                <div id="gameGrid" class="game-grid"></div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="pagination">
+                    <div id="pageInfo" class="pagination__info"></div>
+                    <div id="paginationBtns" class="pagination__buttons"></div>
+                    <div class="pagination__per-page">
+                        <span style="color: var(--text-muted);" data-i18n="pagination.itemsPerPage">Hiển thị:</span>
+                        <select id="itemsPerPageSelect" class="pagination__select">
+                            <option value="24">24</option>
+                            <option value="48">48</option>
+                            <option value="60" selected>60</option>
+                            <option value="96">96</option>
+                            <option value="120">120</option>
+                        </select>
+                        <span style="color: var(--text-muted);" data-i18n="pagination.games">games</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container footer__content">
+                <div class="footer__logo">
+                    <span class="footer__logo-icon">🎮</span>
+                    <span class="footer__logo-text">NES Game Library</span>
+                </div>
+                <p class="footer__powered">
+                    <span data-i18n="footer.poweredBy">Powered by</span> 
+                    <a href="https://github.com/nicklockwood/Nostalgist" class="footer__link">Nostalgist.js</a>
+                </p>
+                <div class="footer__stats">
+                    <span class="footer__stat">🕹️ 1700+ <span data-i18n="footer.gamesCount">Games</span></span>
+                    <span>•</span>
+                    <span class="footer__stat">💻 <span data-i18n="footer.playOnBrowser">Chơi trên trình duyệt</span></span>
+                    <span>•</span>
+                    <span class="footer__stat">⭐ <span data-i18n="footer.free100">Miễn phí 100%</span></span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="scroll-top-btn" title="Lên đầu trang">↑</button>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background: var(--bg-primary);">
+        <div class="relative w-full h-full flex flex-col">
+            <!-- Top Bar -->
+            <div class="flex items-center justify-between p-4" style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
+                <div class="flex items-center gap-3">
+                    <div class="section-icon" style="width: 40px; height: 40px;">
+                        <span>🎮</span>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="font-bold" style="color: var(--text-primary);">Game Title</h3>
+                        <p style="font-size: var(--text-xs); color: var(--text-muted);" data-i18n="modal.pressEscToBack">Nhấn ESC để quay lại</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleFullscreen()" class="btn btn-secondary btn-sm">
+                        <span>⛶</span> 
+                        <span data-i18n="modal.fullscreen">Fullscreen</span>
+                    </button>
+                    <button onclick="closeModal()" class="btn btn-danger btn-sm">
+                        <span>✕</span> 
+                        <span data-i18n="modal.close">Đóng</span> (ESC)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Container -->
+            <div id="gameContainer" class="flex-1 flex items-center justify-center overflow-hidden" style="background: #000;">
+                <div class="text-center" style="color: var(--text-muted);">
+                    <div class="text-6xl mb-4" style="animation: pulse 2s infinite;">🎮</div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+
+            <!-- Controls Bar -->
+            <div class="p-4" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+                <div class="flex flex-wrap justify-center gap-4 text-xs" style="color: var(--text-muted);">
+                    <div class="flex items-center gap-2">
+                        <kbd class="px-2 py-1 rounded" style="background: var(--bg-tertiary);">↑↓←→</kbd>
+                        <span>Di chuyển</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd class="px-2 py-1 rounded" style="background: var(--color-success); color: white;">Z</kbd>
+                        <span>Nút A</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd class="px-2 py-1 rounded" style="background: var(--color-info); color: white;">X</kbd>
+                        <span>Nút B</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd class="px-2 py-1 rounded" style="background: var(--color-warning); color: white;">Enter</kbd>
+                        <span>Start</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <kbd class="px-2 py-1 rounded" style="background: var(--color-accent); color: white;">ESC</kbd>
+                        <span>Quay lại</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/data/games.js"></script>
+    <script src="assets/js/i18n.js"></script>
+
+    <!-- Module Scripts -->
+    <script src="assets/js/modules/config.js"></script>
+    <script src="assets/js/modules/state.js"></script>
+    <script src="assets/js/modules/dom.js"></script>
+    <script src="assets/js/modules/utils.js"></script>
+    <script src="assets/js/modules/imageLoader.js"></script>
+    <script src="assets/js/modules/recentGames.js"></script>
+    <script src="assets/js/modules/search.js"></script>
+    <script src="assets/js/modules/pagination.js"></script>
+    <script src="assets/js/modules/gameRenderer.js"></script>
+    <script src="assets/js/modules/modal.js"></script>
+    <script src="assets/js/modules/gamePlayer.js"></script>
+    <script src="assets/js/modules/theme.js"></script>
+
+    <!-- Main Application -->
+    <script src="assets/js/app.js"></script>
+</body>
+
+</html>

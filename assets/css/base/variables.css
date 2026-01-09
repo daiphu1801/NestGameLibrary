@@ -1,0 +1,329 @@
+/* ==============================================
+   NES GAME LIBRARY - CSS VARIABLES
+   Modern Black & White Theme 2026
+   Glassmorphism & Neumorphism Design System
+   ============================================== */
+
+:root {
+    /* ===== TYPOGRAPHY ===== */
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-game: 'Press Start 2P', monospace;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Font Sizes - Fluid Typography */
+    --text-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.75rem);
+    --text-sm: clamp(0.75rem, 0.725rem + 0.125vw, 0.875rem);
+    --text-base: clamp(0.875rem, 0.85rem + 0.125vw, 1rem);
+    --text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    --text-xl: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+    --text-2xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+    --text-3xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+    --text-4xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
+    --text-5xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* ===== SPACING SYSTEM ===== */
+    --space-0: 0;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+
+    /* ===== BORDER RADIUS ===== */
+    --radius-none: 0;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.25rem;
+    --radius-3xl: 1.5rem;
+    --radius-4xl: 2rem;
+    --radius-full: 9999px;
+
+    /* ===== TRANSITIONS ===== */
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-slow: 350ms;
+    --duration-slower: 500ms;
+    --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --transition-fast: var(--duration-fast) var(--ease-default);
+    --transition-base: var(--duration-base) var(--ease-default);
+    --transition-slow: var(--duration-slow) var(--ease-default);
+    --transition-bounce: var(--duration-base) var(--ease-bounce);
+    --transition-elastic: var(--duration-slow) var(--ease-elastic);
+
+    /* ===== Z-INDEX SCALE ===== */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-overlay: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+
+    /* ===== LAYOUT ===== */
+    --header-height: 80px;
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+    --container-xl: 1280px;
+    --container-2xl: 1536px;
+
+    /* ===== CARD SETTINGS ===== */
+    --card-aspect-ratio: 4/3;
+}
+
+/* ==============================================
+   DARK THEME (Default) - Modern Monochrome
+   ============================================== */
+[data-theme="dark"] {
+    /* Primary Palette - Monochrome with Accent */
+    --color-primary: #ffffff;
+    --color-primary-light: #f5f5f5;
+    --color-primary-dark: #e0e0e0;
+    
+    --color-secondary: #a1a1aa;
+    --color-secondary-light: #d4d4d8;
+    --color-secondary-dark: #71717a;
+
+    --color-accent: #8b5cf6;
+    --color-accent-light: #a78bfa;
+    --color-accent-dark: #7c3aed;
+    
+    /* Semantic Colors */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
+
+    /* Background Colors - Deep Blacks */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #111111;
+    --bg-tertiary: #171717;
+    --bg-card: #141414;
+    --bg-card-hover: #1a1a1a;
+    --bg-elevated: #1f1f1f;
+
+    /* Text Colors */
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --text-accent: #a78bfa;
+    --text-inverse: #0a0a0a;
+
+    /* Border Colors */
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color-strong: rgba(255, 255, 255, 0.15);
+    --border-color-subtle: rgba(255, 255, 255, 0.04);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(20, 20, 20, 0.7);
+    --glass-bg-strong: rgba(20, 20, 20, 0.85);
+    --glass-bg-subtle: rgba(20, 20, 20, 0.4);
+    --glass-blur: blur(24px);
+    --glass-blur-strong: blur(40px);
+    --glass-border: rgba(255, 255, 255, 0.06);
+
+    /* Neumorphism */
+    --neu-bg: #141414;
+    --neu-shadow-dark: rgba(0, 0, 0, 0.5);
+    --neu-shadow-light: rgba(255, 255, 255, 0.03);
+    --neu-inset-dark: rgba(0, 0, 0, 0.3);
+    --neu-inset-light: rgba(255, 255, 255, 0.02);
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+
+    /* Glow Effects */
+    --shadow-glow-primary: 0 0 20px rgba(139, 92, 246, 0.3);
+    --shadow-glow-accent: 0 0 20px rgba(139, 92, 246, 0.25);
+    --shadow-glow-white: 0 0 30px rgba(255, 255, 255, 0.1);
+    --shadow-card-hover: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 60px rgba(139, 92, 246, 0.15);
+
+    /* Neumorphism Shadows */
+    --neu-shadow-outer: 
+        8px 8px 16px var(--neu-shadow-dark),
+        -8px -8px 16px var(--neu-shadow-light);
+    --neu-shadow-inner: 
+        inset 4px 4px 8px var(--neu-inset-dark),
+        inset -4px -4px 8px var(--neu-inset-light);
+    --neu-shadow-pressed: 
+        inset 6px 6px 12px var(--neu-shadow-dark),
+        inset -6px -6px 12px var(--neu-shadow-light);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+    --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+    --gradient-card: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    --gradient-bg: linear-gradient(180deg, #0a0a0a 0%, #111111 50%, #0a0a0a 100%);
+    --gradient-shine: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 100%
+    );
+    --gradient-mesh: 
+        radial-gradient(at 20% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(at 80% 70%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+        radial-gradient(at 40% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+}
+
+/* ==============================================
+   LIGHT THEME - Clean & Minimal
+   ============================================== */
+[data-theme="light"] {
+    /* Primary Palette */
+    --color-primary: #18181b;
+    --color-primary-light: #27272a;
+    --color-primary-dark: #09090b;
+
+    --color-secondary: #52525b;
+    --color-secondary-light: #71717a;
+    --color-secondary-dark: #3f3f46;
+
+    --color-accent: #7c3aed;
+    --color-accent-light: #8b5cf6;
+    --color-accent-dark: #6d28d9;
+
+    /* Semantic Colors */
+    --color-success: #059669;
+    --color-warning: #d97706;
+    --color-error: #dc2626;
+    --color-info: #2563eb;
+
+    /* Background Colors - Clean Whites */
+    --bg-primary: #fafafa;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e5e5e5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9fafb;
+    --bg-elevated: #ffffff;
+
+    /* Text Colors */
+    --text-primary: #18181b;
+    --text-secondary: #52525b;
+    --text-muted: #71717a;
+    --text-accent: #7c3aed;
+    --text-inverse: #fafafa;
+
+    /* Border Colors */
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color-strong: rgba(0, 0, 0, 0.15);
+    --border-color-subtle: rgba(0, 0, 0, 0.04);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-bg-strong: rgba(255, 255, 255, 0.9);
+    --glass-bg-subtle: rgba(255, 255, 255, 0.5);
+    --glass-blur: blur(24px);
+    --glass-blur-strong: blur(40px);
+    --glass-border: rgba(0, 0, 0, 0.06);
+
+    /* Neumorphism */
+    --neu-bg: #f0f0f0;
+    --neu-shadow-dark: rgba(0, 0, 0, 0.12);
+    --neu-shadow-light: rgba(255, 255, 255, 0.9);
+    --neu-inset-dark: rgba(0, 0, 0, 0.08);
+    --neu-inset-light: rgba(255, 255, 255, 0.7);
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.12);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.15);
+
+    /* Glow Effects */
+    --shadow-glow-primary: 0 0 20px rgba(124, 58, 237, 0.2);
+    --shadow-glow-accent: 0 0 20px rgba(124, 58, 237, 0.15);
+    --shadow-glow-white: 0 0 30px rgba(255, 255, 255, 0.5);
+    --shadow-card-hover: 
+        0 20px 40px rgba(0, 0, 0, 0.08),
+        0 0 60px rgba(124, 58, 237, 0.08);
+
+    /* Neumorphism Shadows */
+    --neu-shadow-outer: 
+        8px 8px 16px var(--neu-shadow-dark),
+        -8px -8px 16px var(--neu-shadow-light);
+    --neu-shadow-inner: 
+        inset 4px 4px 8px var(--neu-inset-dark),
+        inset -4px -4px 8px var(--neu-inset-light);
+    --neu-shadow-pressed: 
+        inset 6px 6px 12px var(--neu-shadow-dark),
+        inset -6px -6px 12px var(--neu-shadow-light);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #18181b 0%, #3f3f46 100%);
+    --gradient-accent: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%);
+    --gradient-card: linear-gradient(145deg, #ffffff, #f0f0f0);
+    --gradient-bg: linear-gradient(180deg, #fafafa 0%, #f5f5f5 50%, #fafafa 100%);
+    --gradient-shine: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.8) 50%,
+        transparent 100%
+    );
+    --gradient-mesh: 
+        radial-gradient(at 20% 30%, rgba(124, 58, 237, 0.06) 0%, transparent 50%),
+        radial-gradient(at 80% 70%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+        radial-gradient(at 40% 80%, rgba(124, 58, 237, 0.02) 0%, transparent 50%);
+}
+
+/* ==============================================
+   UTILITY CLASSES FOR VARIABLES
+   ============================================== */
+
+/* Quick access to accent colors */
+.accent {
+    color: var(--color-accent);
+}
+
+.accent-bg {
+    background: var(--color-accent);
+}
+
+/* Dark mode indicator */
+[data-theme="dark"] .dark\:hidden {
+    display: none;
+}
+
+[data-theme="light"] .light\:hidden {
+    display: none;
+}

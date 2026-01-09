@@ -1,0 +1,861 @@
+// NES Game Library - Application Logic
+// With i18n support
+
+const GAME_CATEGORIES = {
+    all: { name: 'all', icon: '🎮' },
+    platformer: { name: 'platformer', icon: '🏃' },
+    rpg: { name: 'rpg', icon: '⚔️' },
+    sports: { name: 'sports', icon: '⚽' },
+    fighting: { name: 'fighting', icon: '🥊' },
+    puzzle: { name: 'puzzle', icon: '🧩' },
+    racing: { name: 'racing', icon: '🏎️' },
+    shooter: { name: 'shooter', icon: '🔫' },
+    strategy: { name: 'strategy', icon: '🎯' },
+    adventure: { name: 'adventure', icon: '🗺️' },
+    other: { name: 'other', icon: '📦' }
+};
+
+// Application State
+let allGames = [];
+let filteredGames = [];
+let currentCategory = 'all';
+let searchQuery = '';
+let currentPage = 1;
+let gamesPerPage = 60;
+let currentSort = 'name-asc';
+let currentNostalgist = null;
+let recentGames = [];
+
+// Check if running on local server
+const isLocalServer = window.location.protocol !== 'file:';
+
+// Handle image loading errors with fallback
+window.handleImageError = function(img) {
+    const fallbacks = img.getAttribute('data-fallbacks');
+    
+    if (fallbacks) {
+        try {
+            const fallbackUrls = JSON.parse(fallbacks);
+            if (fallbackUrls && fallbackUrls.length > 0) {
+                // Try the first fallback URL
+                const nextUrl = fallbackUrls.shift();
+                img.setAttribute('data-fallbacks', JSON.stringify(fallbackUrls));
+                img.src = nextUrl;
+                return; // Don't hide yet, try the fallback
+            }
+        } catch (e) {
+            console.error('Error parsing fallback URLs:', e);
+        }
+    }
+    
+    // No more fallbacks, hide image and show icon
+    img.style.display = 'none';
+    const iconDiv = img.nextElementSibling;
+    if (iconDiv) {
+        iconDiv.classList.remove('hidden');
+        iconDiv.style.display = 'flex';
+    }
+};
+
+// DOM Elements
+let gameGrid, searchInput, gameModal, modalTitle, gameContainer, loadingOverlay, gameCount;
+let clearSearchBtn, searchBtn, sortSelect, itemsPerPageSelect, paginationContainer, scrollTopBtn;
+
+// Lazy load images with optimized settings
+function lazyLoadImages() {
+    const lazyImages = document.querySelectorAll('img.lazy-load');
+    
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    // Set loading attribute for browser optimization
+                    img.loading = 'lazy';
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy-load');
+                    img.classList.add('loaded');
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            // Increased margin to load images earlier
+            rootMargin: '200px',
+            // Load as soon as any pixel is visible
+            threshold: 0.01
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        lazyImages.forEach(img => {
+            img.src = img.dataset.src;
+            img.classList.remove('lazy-load');
+            img.classList.add('loaded');
+        });
+    }
+}
+
+// Initialize application
+async function init() {
+    // Initialize i18n first
+    await I18n.init();
+
+    // Get DOM elements
+    gameGrid = document.getElementById('gameGrid');
+    searchInput = document.getElementById('searchInput');
+    gameModal = document.getElementById('gameModal');
+    modalTitle = document.getElementById('modalTitle');
+    gameContainer = document.getElementById('gameContainer');
+    loadingOverlay = document.getElementById('loadingOverlay');
+    gameCount = document.getElementById('gameCount');
+    clearSearchBtn = document.getElementById('clearSearchBtn');
+    searchBtn = document.getElementById('searchBtn');
+    sortSelect = document.getElementById('sortSelect');
+    itemsPerPageSelect = document.getElementById('itemsPerPageSelect');
+    paginationContainer = document.getElementById('paginationContainer');
+    scrollTopBtn = document.getElementById('scrollTopBtn');
+
+    // Load recent games from localStorage
+    loadRecentGames();
+
+    showLoading();
+    await loadGames();
+    setupEventListeners();
+    filterAndRenderGames();
+    hideLoading();
+
+    // Update welcome message with game count
+    updateWelcomeMessage();
+}
+
+// Update welcome message with game count
+function updateWelcomeMessage() {
+    const welcomeDesc = document.getElementById('welcomeDescription');
+    if (welcomeDesc) {
+        welcomeDesc.textContent = t('welcome.description', { count: allGames.length });
+    }
+}
+
+// Load games from games.js
+async function loadGames() {
+    if (typeof GAMES_DATA !== 'undefined') {
+        allGames = GAMES_DATA;
+        console.log(`Loaded ${allGames.length} games from GAMES_DATA`);
+        return;
+    }
+
+    try {
+        const response = await fetch('assets/data/games.json');
+        if (response.ok) {
+            allGames = await response.json();
+            console.log(`Loaded ${allGames.length} games from games.json`);
+            return;
+        }
+    } catch (error) {
+        console.log('Could not load games.json:', error);
+    }
+
+    allGames = generateDemoGames();
+    console.log(`Using ${allGames.length} demo games`);
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Search input with debounce for live search
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            // Show/hide clear button
+            if (clearSearchBtn) {
+                clearSearchBtn.classList.toggle('hidden', !e.target.value);
+            }
+        });
+
+        // Enter key to search
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+    }
+
+    // Clear search button
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            if (searchInput) {
+                searchInput.value = '';
+                clearSearchBtn.classList.add('hidden');
+                searchQuery = '';
+                currentPage = 1;
+                filterAndRenderGames();
+                searchInput.focus();
+            }
+        });
+    }
+
+    // Search button
+    if (searchBtn) {
+        searchBtn.addEventListener('click', performSearch);
+    }
+
+    // Sort select
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            currentPage = 1;
+            filterAndRenderGames();
+        });
+    }
+
+    // Items per page select
+    if (itemsPerPageSelect) {
+        itemsPerPageSelect.addEventListener('change', (e) => {
+            gamesPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            filterAndRenderGames();
+        });
+    }
+
+    // Scroll to top button
+    if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Show/hide scroll to top button on scroll
+        window.addEventListener('scroll', debounce(() => {
+            if (window.scrollY > 500) {
+                scrollTopBtn.classList.remove('opacity-0', 'invisible');
+                scrollTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                scrollTopBtn.classList.add('opacity-0', 'invisible');
+                scrollTopBtn.classList.remove('opacity-100', 'visible');
+            }
+        }, 100));
+    }
+
+    // Category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentCategory = btn.dataset.category;
+            currentPage = 1;
+
+            // Update active state
+            document.querySelectorAll('.category-btn').forEach(b => {
+                b.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg', 'shadow-purple-500/30');
+                b.classList.add('bg-gray-800', 'text-gray-300');
+            });
+            btn.classList.remove('bg-gray-800', 'text-gray-300');
+            btn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg', 'shadow-purple-500/30');
+
+            filterAndRenderGames();
+        });
+    });
+
+    // Close modal on backdrop click
+    if (gameModal) {
+        gameModal.addEventListener('click', (e) => {
+            if (e.target === gameModal) {
+                closeModal();
+            }
+        });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (searchInput) searchInput.focus();
+        }
+
+        // Prevent arrow keys and game keys from being captured by browser when playing
+        const gameKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 'Z', 'x', 'X', 'Enter', 'Shift', ' '];
+        if (gameModal && !gameModal.classList.contains('hidden') && gameKeys.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Language change event
+    window.addEventListener('languageChanged', () => {
+        filterAndRenderGames();
+        updateWelcomeMessage();
+    });
+}
+
+// Perform search
+function performSearch() {
+    if (searchInput) {
+        searchQuery = searchInput.value.toLowerCase().trim();
+        currentPage = 1;
+        filterAndRenderGames();
+        
+        // Scroll to game grid
+        if (gameGrid) {
+            gameGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+// Filter and render games
+function filterAndRenderGames() {
+    filteredGames = allGames.filter(game => {
+        const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
+        const matchesSearch = !searchQuery ||
+            game.name.toLowerCase().includes(searchQuery) ||
+            (game.description && game.description.toLowerCase().includes(searchQuery));
+
+        return matchesCategory && matchesSearch;
+    });
+
+    // Sort games
+    sortGames();
+
+    // Update count
+    if (gameCount) {
+        gameCount.textContent = filteredGames.length;
+    }
+
+    renderGames();
+    renderPagination();
+}
+
+// Sort games based on current sort option
+function sortGames() {
+    switch (currentSort) {
+        case 'name-asc':
+            filteredGames.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name-desc':
+            filteredGames.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        case 'rating-desc':
+            filteredGames.sort((a, b) => (b.rating || 3) - (a.rating || 3));
+            break;
+        case 'year-desc':
+            filteredGames.sort((a, b) => (b.year || 1985) - (a.year || 1985));
+            break;
+        case 'year-asc':
+            filteredGames.sort((a, b) => (a.year || 1985) - (b.year || 1985));
+            break;
+    }
+}
+
+// Render games to grid
+function renderGames() {
+    if (!gameGrid) return;
+
+    const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+    // Ensure currentPage is within bounds
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+
+    const start = (currentPage - 1) * gamesPerPage;
+    const end = start + gamesPerPage;
+    const gamesToShow = filteredGames.slice(start, end);
+
+    gameGrid.innerHTML = '';
+
+    if (gamesToShow.length === 0) {
+        gameGrid.innerHTML = `
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                <svg class="w-20 h-20 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-xl">${t('search.noResults')}</p>
+                <p class="text-sm mt-2">${t('search.tryOther')}</p>
+                ${searchQuery ? `<button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-white transition-colors">${t('search.clearSearch')}</button>` : ''}
+            </div>
+        `;
+        return;
+    }
+
+    gamesToShow.forEach(game => {
+        const card = createGameCard(game);
+        gameGrid.appendChild(card);
+    });
+    
+    // Eager load first 12 images (first viewport), lazy load rest
+    requestAnimationFrame(() => {
+        const allImages = gameGrid.querySelectorAll('img.lazy-load');
+        allImages.forEach((img, idx) => {
+            if (idx < 12) {
+                // Eager load first 12 images
+                img.loading = 'eager';
+                img.src = img.dataset.src;
+                img.classList.remove('lazy-load');
+                img.classList.add('loaded');
+            }
+        });
+        
+        // Initialize lazy loading for remaining images
+        lazyLoadImages();
+    });
+}
+
+// Clear search function
+function clearSearch() {
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    if (clearSearchBtn) {
+        clearSearchBtn.classList.add('hidden');
+    }
+    searchQuery = '';
+    currentPage = 1;
+    filterAndRenderGames();
+}
+
+// Render pagination
+function renderPagination() {
+    const paginationBtns = document.getElementById('paginationBtns');
+    const pageInfo = document.getElementById('pageInfo');
+    
+    if (!paginationBtns || !paginationContainer) return;
+
+    const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+    const start = (currentPage - 1) * gamesPerPage + 1;
+    const end = Math.min(currentPage * gamesPerPage, filteredGames.length);
+
+    // Hide pagination if no results or only one page
+    if (filteredGames.length === 0) {
+        paginationContainer.classList.add('hidden');
+        return;
+    }
+    paginationContainer.classList.remove('hidden');
+
+    // Update page info
+    if (pageInfo) {
+        pageInfo.innerHTML = `${t('pagination.showing')} <span class="font-bold text-purple-400">${start}-${end}</span> ${t('pagination.of')} <span class="font-bold text-white">${filteredGames.length}</span> ${t('pagination.games')}`;
+    }
+
+    // Generate pagination buttons
+    paginationBtns.innerHTML = '';
+
+    if (totalPages <= 1) {
+        return;
+    }
+
+    // Previous button
+    const prevBtn = createPaginationButton('←', currentPage > 1, () => goToPage(currentPage - 1));
+    prevBtn.title = t('pagination.previous');
+    paginationBtns.appendChild(prevBtn);
+
+    // First page
+    if (currentPage > 3) {
+        paginationBtns.appendChild(createPaginationButton('1', true, () => goToPage(1)));
+        if (currentPage > 4) {
+            paginationBtns.appendChild(createEllipsis());
+        }
+    }
+
+    // Page numbers
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        const btn = createPaginationButton(i.toString(), true, () => goToPage(i), i === currentPage);
+        paginationBtns.appendChild(btn);
+    }
+
+    // Last page
+    if (currentPage < totalPages - 2) {
+        if (currentPage < totalPages - 3) {
+            paginationBtns.appendChild(createEllipsis());
+        }
+        paginationBtns.appendChild(createPaginationButton(totalPages.toString(), true, () => goToPage(totalPages)));
+    }
+
+    // Next button
+    const nextBtn = createPaginationButton('→', currentPage < totalPages, () => goToPage(currentPage + 1));
+    nextBtn.title = t('pagination.next');
+    paginationBtns.appendChild(nextBtn);
+}
+
+// Create pagination button
+function createPaginationButton(text, enabled, onClick, isActive = false) {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.className = `px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+        isActive 
+            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30' 
+            : enabled 
+                ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white' 
+                : 'bg-gray-800/50 text-gray-600 cursor-not-allowed'
+    }`;
+    
+    if (enabled && !isActive) {
+        btn.addEventListener('click', onClick);
+    }
+    
+    return btn;
+}
+
+// Create ellipsis element
+function createEllipsis() {
+    const span = document.createElement('span');
+    span.textContent = '...';
+    span.className = 'px-2 text-gray-500';
+    return span;
+}
+
+// Go to specific page
+function goToPage(page) {
+    const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+    if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderGames();
+        renderPagination();
+        
+        // Smooth scroll to game grid
+        if (gameGrid) {
+            gameGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+// Create game card element
+function createGameCard(game) {
+    const card = document.createElement('div');
+    card.className = 'game-card group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 border border-gray-700/50 hover:border-purple-500/50';
+
+    const categoryInfo = GAME_CATEGORIES[game.category] || GAME_CATEGORIES.other;
+    const categoryName = t(`categories.${game.category}`) || t('categories.other');
+    const stars = '★'.repeat(game.rating || 3) + '☆'.repeat(5 - (game.rating || 3));
+    
+    // Image URL - support multiple sources with fallback
+    const imageUrl = game.image || game.thumbnail || game.cover || null;
+    const imageFallbacks = [];
+    if (game.imageSnap) imageFallbacks.push(game.imageSnap);
+    if (game.imageTitle) imageFallbacks.push(game.imageTitle);
+    
+    // Build fallback attribute
+    const fallbackAttr = imageFallbacks.length > 0 ? `data-fallbacks='${JSON.stringify(imageFallbacks)}'` : '';
+
+    card.innerHTML = `
+        <div class="aspect-square bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center relative overflow-hidden">
+            ${imageUrl ? `
+                <img 
+                    data-src="${imageUrl}"
+                    ${fallbackAttr}
+                    alt="${game.name}"
+                    class="lazy-load w-full h-full object-cover"
+                    onerror="handleImageError(this)"
+                />
+                <div class="hidden absolute inset-0 flex items-center justify-center text-6xl opacity-30">
+                    ${categoryInfo.icon}
+                </div>
+            ` : `
+                <div class="text-6xl opacity-30 group-hover:opacity-50 transition-opacity">${categoryInfo.icon}</div>
+            `}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+            ${game.isFeatured ? '<div class="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">⭐ HOT</div>' : ''}
+            ${game.region ? `<div class="absolute top-2 left-2 bg-blue-600/90 backdrop-blur text-white text-xs font-medium px-2 py-1 rounded-full">${game.region.split(',')[0]}</div>` : ''}
+            <div class="absolute bottom-0 left-0 right-0 p-3">
+                <span class="inline-flex items-center gap-1 text-xs bg-purple-600/80 backdrop-blur px-2 py-1 rounded-full">
+                    ${categoryInfo.icon} ${categoryName}
+                </span>
+            </div>
+        </div>
+        <div class="p-4">
+            <h3 class="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-purple-300 transition-colors">${game.name}</h3>
+            <p class="text-xs text-gray-400 line-clamp-2 mb-3">${game.description || 'Classic NES game'}</p>
+            <div class="flex items-center justify-between">
+                <span class="text-yellow-400 text-xs">${stars}</span>
+                ${game.year ? `<span class="text-xs text-gray-500">${game.year}</span>` : ''}
+            </div>
+        </div>
+        <div class="absolute inset-0 bg-purple-600/0 group-hover:bg-purple-600/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="bg-purple-600 text-white px-4 py-2 rounded-full font-bold transform scale-0 group-hover:scale-100 transition-transform duration-300 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                </svg>
+                ${t('game.playNow')}
+            </div>
+        </div>
+    `;
+
+    card.addEventListener('click', () => {
+        saveRecentGame(game);
+        playGame(game);
+    });
+
+    return card;
+}
+
+// Play game
+async function playGame(game) {
+    showModal(game);
+
+    const container = document.getElementById('gameContainer');
+    container.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-white">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mb-4"></div>
+            <p class="text-lg mb-2">${t('game.loading')} ${game.name}...</p>
+            <p class="text-sm text-gray-400">${t('game.waitMessage')}</p>
+        </div>
+    `;
+
+    try {
+        if (currentNostalgist) {
+            try {
+                await currentNostalgist.exit();
+            } catch (e) {
+                console.log('Could not exit previous emulator:', e);
+            }
+            currentNostalgist = null;
+        }
+
+        container.innerHTML = '';
+
+        if (isLocalServer && game.path) {
+            const encodedPath = encodeURI(game.path);
+            console.log(`Loading game from: ${encodedPath}`);
+
+            // Use respondToGlobalEvents to capture keyboard input globally
+            currentNostalgist = await Nostalgist.nes({
+                rom: encodedPath,
+                respondToGlobalEvents: true
+            });
+
+            const canvas = currentNostalgist.getCanvas();
+            container.appendChild(canvas);
+            canvas.style.cssText = 'width:100%;height:100%;object-fit:contain;image-rendering:pixelated;';
+            canvas.tabIndex = 0;
+            canvas.focus();
+
+            console.log('Game loaded successfully!');
+        } else {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-white p-8">
+                    <div class="text-6xl mb-4">📁</div>
+                    <p class="text-lg mb-4 text-center">${t('game.runServerHint')}</p>
+                    <code class="bg-gray-800 px-4 py-2 rounded-lg text-purple-400 mb-6">npx serve .</code>
+                    <p class="text-gray-400 mb-4">${t('game.orSelectManually')}</p>
+                    <button onclick="pickAndPlayGame()" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-lg font-bold transition-colors">
+                        📂 ${t('game.selectRom')}
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading game:', error);
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full text-white p-8 text-center">
+                <svg class="w-16 h-16 mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <p class="text-xl mb-2">${t('game.loadError')}</p>
+                <p class="text-gray-400 mb-4">${error.message || t('game.tryAgain')}</p>
+                <button onclick="pickAndPlayGame()" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-lg font-bold transition-colors">
+                    📂 ${t('game.selectRom')}
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Pick file and play (fallback)
+async function pickAndPlayGame() {
+    try {
+        const container = document.getElementById('gameContainer');
+        container.innerHTML = '';
+
+        currentNostalgist = await Nostalgist.nes({
+            rom: showOpenFilePicker,
+            respondToGlobalEvents: true
+        });
+
+        const canvas = currentNostalgist.getCanvas();
+        container.appendChild(canvas);
+        canvas.style.cssText = 'width:100%;height:100%;object-fit:contain;image-rendering:pixelated;';
+
+        // Focus canvas for keyboard input
+        canvas.tabIndex = 0;
+        canvas.focus();
+    } catch (error) {
+        console.error('Error with file picker:', error);
+        const container = document.getElementById('gameContainer');
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full text-white p-8 text-center">
+                <p class="text-red-400">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Show modal
+function showModal(game) {
+    if (!modalTitle || !gameModal) return;
+
+    modalTitle.textContent = game.name;
+    gameModal.classList.remove('hidden');
+    gameModal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+// Close modal
+function closeModal() {
+    if (!gameModal) return;
+
+    gameModal.classList.add('hidden');
+    gameModal.classList.remove('flex');
+    document.body.style.overflow = '';
+
+    if (currentNostalgist) {
+        try {
+            currentNostalgist.exit();
+        } catch (e) {
+            console.log('Error stopping emulator:', e);
+        }
+        currentNostalgist = null;
+    }
+
+    const container = document.getElementById('gameContainer');
+    if (container) container.innerHTML = '';
+}
+
+// Fullscreen toggle
+function toggleFullscreen() {
+    const modal = document.getElementById('gameModal');
+    if (!document.fullscreenElement) {
+        modal.requestFullscreen().catch(err => {
+            console.log('Fullscreen error:', err);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Show/hide loading
+function showLoading() {
+    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+}
+
+function hideLoading() {
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+}
+
+// Debounce utility
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Recent games management
+function loadRecentGames() {
+    try {
+        const saved = localStorage.getItem('nesLibraryRecentGames');
+        if (saved) {
+            recentGames = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.log('Could not load recent games:', e);
+        recentGames = [];
+    }
+}
+
+function saveRecentGame(game) {
+    try {
+        // Remove if already exists
+        recentGames = recentGames.filter(g => g.id !== game.id);
+        // Add to beginning
+        recentGames.unshift({
+            id: game.id,
+            name: game.name,
+            category: game.category,
+            path: game.path,
+            rating: game.rating,
+            playedAt: Date.now()
+        });
+        // Keep only last 10
+        recentGames = recentGames.slice(0, 10);
+        localStorage.setItem('nesLibraryRecentGames', JSON.stringify(recentGames));
+    } catch (e) {
+        console.log('Could not save recent game:', e);
+    }
+}
+
+function getRecentGames() {
+    return recentGames.map(recent => {
+        const fullGame = allGames.find(g => g.id === recent.id);
+        return fullGame || recent;
+    }).filter(Boolean);
+}
+
+// Demo games fallback
+function generateDemoGames() {
+    const demoGames = [
+        'Super Mario Bros.', 'Super Mario Bros. 2', 'Super Mario Bros. 3',
+        'Mega Man', 'Mega Man 2', 'Castlevania', 'Contra',
+        'The Legend of Zelda', 'Final Fantasy', 'Tetris',
+        'Metroid', 'Punch-Out!!', 'Double Dragon'
+    ];
+
+    return demoGames.map((name, i) => ({
+        id: i + 1,
+        name: name,
+        path: null,
+        category: 'platformer',
+        description: 'Classic NES game',
+        rating: 4,
+        year: 1985 + i,
+        isFeatured: i < 5
+    }));
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', init);
+
+// Reset to default state
+function resetToDefault() {
+    // Reset all filters
+    currentCategory = 'all';
+    searchQuery = '';
+    currentPage = 1;
+    currentSort = 'name-asc';
+    
+    // Clear search input
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    if (clearSearchBtn) {
+        clearSearchBtn.classList.add('hidden');
+    }
+    
+    // Reset sort select
+    if (sortSelect) {
+        sortSelect.value = 'name-asc';
+    }
+    
+    // Reset items per page
+    if (itemsPerPageSelect) {
+        itemsPerPageSelect.value = '60';
+        gamesPerPage = 60;
+    }
+    
+    // Update category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        if (btn.dataset.category === 'all') {
+            btn.classList.remove('bg-gray-800', 'text-gray-300');
+            btn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg', 'shadow-purple-500/30');
+        } else {
+            btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg', 'shadow-purple-500/30');
+            btn.classList.add('bg-gray-800', 'text-gray-300');
+        }
+    });
+    
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Re-render games
+    filterAndRenderGames();
+}

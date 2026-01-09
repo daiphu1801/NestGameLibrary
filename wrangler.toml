@@ -1,0 +1,27 @@
+# Wrangler Configuration for NES Game Library
+# This file configures Cloudflare Workers and R2 settings
+
+name = "nesgame-library"
+compatibility_date = "2024-01-01"
+
+# R2 Bucket Binding
+# This makes R2 always use REMOTE mode by default
+[[r2_buckets]]
+binding = "NESGAME"
+bucket_name = "nesgame"
+preview_bucket_name = "nesgame-preview" # Optional: for dev/staging
+
+# Account ID (from your Cloudflare account)
+account_id = "970acc5a70e3d6f506a896791ec37494"
+
+# Node.js compatibility (if using Node APIs)
+compatibility_flags = ["nodejs_compat"]
+
+# Build configuration
+[build]
+command = "npm run build"
+
+# Development settings
+[dev]
+# Force remote mode in development
+# remote = true  # Uncomment to always use remote R2 in dev
